@@ -116,6 +116,7 @@ func main() {
 		},
 	}
 	app.Commands = []cli.Command{
+		migrateCommand,
 		checkpointCommand,
 		createCommand,
 		deleteCommand,
