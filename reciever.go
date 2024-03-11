@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-func main() {
+func receive() {
 	listener, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		log.Fatal(err)

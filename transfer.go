@@ -91,7 +91,8 @@ func transfer(dumpType int, ipAddress, checkpointDir string) {
 	log.Println("Directory and dump type sent successfully")
 }
 
-func main() {
-	// Example usage
-	transfer(1, "172.31.28.114", "/home/ubuntu/tmp/checkpoint")
-}
+// func main() {
+// 	// Example usage
+// 	// transfer(1, "172.31.28.114", "/home/ubuntu/tmp/checkpoint")
+// 	transfer(1, "172.31.22.243", "/home/ubuntu/mycontainer/checkpoint/")
+// }
