@@ -89,7 +89,7 @@ checkpointed.`,
 			container.Checkpoint(options)
 		}
 
-		if context.Bool("local-test") || context.Bool("reciever") {
+		if context.Bool("local-test") || context.Bool("receiver") {
 			status, err := startContainer(context, CT_ACT_RESTORE, options)
 			if err != nil {
 				return err
