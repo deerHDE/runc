@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/opencontainers/runc/libcontainer"
 	"github.com/opencontainers/runc/libcontainer/userns"
@@ -89,11 +90,16 @@ checkpointed.`,
 
 			}
 			options.PreDump = false
+			// time 1
+			currentTime := time.Now()
+			fmt.Println("Dumping Start:", currentTime.Format("2006-01-02 15:04:05.000000"))
 			container.Checkpoint(options)
 		}
 
 		if context.Bool("local-test") || context.Bool("receiver") {
 			status, err := startContainer(context, CT_ACT_RESTORE, options)
+			currentTime := time.Now()
+			fmt.Println("Restore Finish:", currentTime.Format("2006-01-02 15:04:05.000000"))
 			if err != nil {
 				return err
 			}
