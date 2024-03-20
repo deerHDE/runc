@@ -23,66 +23,95 @@ func receive() {
 		log.Fatal(err)
 	}
 	defer listener.Close()
+
 	for{
 		conn, err := listener.Accept()
+
 		if err != nil {
 			log.Fatal(err)
+			continue
 		}
-		defer conn.Close()
-	
-		// Read the dumpType value
-		var dumpType int32
-		err = binary.Read(conn, binary.BigEndian, &dumpType)
+		log.Println("Connection accepted")
+		// defer conn.Close()
+
+		// Read the json value
+		jsonBytes := make([]byte, 1024)
+		n, err := conn.Read(jsonBytes)
 		if err != nil {
-			log.Fatal("Failed to read dump type:", err)
+			log.Fatal(err)
+			conn.Close()
+			continue
 		}
-	
+
+		log.Println("message read from connection")
+
+		var msg Message
+		err = json.Unmarshal(jsonBytes[:n], &msg)
+		if err != nil {
+			log.Fatal(err)
+			conn.Close()
+			continue
+		}
+
+
+		// var dumpType int32
+		// err = binary.Read(conn, binary.BigEndian, &dumpType)
+		// if err != nil {
+		// 	log.Fatal("Failed to read dump type:", err)
+		// }
+
 		// Receive and unzip the file
-		gzipReader, err := gzip.NewReader(conn)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer gzipReader.Close()
-	
-		tarReader := tar.NewReader(gzipReader)
-	
-		for {
-			header, err := tarReader.Next()
-			if err == io.EOF {
-				break // End of archive
-			}
-			if err != nil {
-				log.Fatal(err)
-			}
-	
-			switch header.Typeflag {
-			case tar.TypeDir:
-				if err := os.Mkdir(header.Name, 0755); err != nil {
-					log.Fatal(err)
-				}
-			case tar.TypeReg:
-				file, err := os.Create(header.Name)
-				if err != nil {
-					log.Fatal(err)
-				}
-				if _, err := io.Copy(file, tarReader); err != nil {
-					log.Fatal(err)
-				}
-				file.Close()
-			}
-		}
-	
-		log.Printf("File received successfully. Dump type: %d\n", dumpType)
-	
+		// gzipReader, err := gzip.NewReader(conn)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		// defer gzipReader.Close()
+
+		// tarReader := tar.NewReader(gzipReader)
+
+		// for {
+		// 	header, err := tarReader.Next()
+		// 	if err == io.EOF {
+		// 		break // End of archive
+		// 	}
+		// 	if err != nil {
+		// 		log.Fatal(err)
+		// 	}
+
+		// 	switch header.Typeflag {
+		// 	case tar.TypeDir:
+		// 		if err := os.Mkdir(header.Name, 0755); err != nil {
+		// 			log.Fatal(err)
+		// 		}
+		// 	case tar.TypeReg:
+		// 		file, err := os.Create(header.Name)
+		// 		if err != nil {
+		// 			log.Fatal(err)
+		// 		}
+		// 		if _, err := io.Copy(file, tarReader); err != nil {
+		// 			log.Fatal(err)
+		// 		}
+		// 		file.Close()
+		// 	}
+		// }
+
+		// log.Printf("File received successfully. Dump type: %d\n", dumpType)
+
 		// Decide what to do with the file based on the dumpType value
 		// For example:
-		switch dumpType {
-		case 1:
-			log.Println("Performing action for pre dump")
-			// Add your logic here
-		case 2:
-			log.Println("Performing action for dump")
-			return
+		dumpType := msg.DumpType
+		log.Println("dump type: ", dumpType)
+
+		if dumpType == 1 {
+			conn.Close()
+			continue
+		} else if dumpType == 2 {
+			log.Println("received json message with dumptype: ", dumpType)
+			conn.Close()
+			break
 		}
+		conn.Close()
+
 	}
+	
 }
