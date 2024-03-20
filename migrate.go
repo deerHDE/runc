@@ -83,8 +83,11 @@ checkpointed.`,
 			if err := setEmptyNsMask(context, options); err != nil {
 				return err
 			}
-			container.Checkpoint(options)
-			// transfer(1, context.String("destination"), context.String("image-path"))
+			for i := 0; i < 3; i++ {
+				container.Checkpoint(options)
+				transfer("cr", 1, context.String("destination"), context.String("image-path"))
+
+			}
 			options.PreDump = false
 			container.Checkpoint(options)
 		}
@@ -101,7 +104,7 @@ checkpointed.`,
 			if context.String("destination") == "" || context.String("image-path") == "" {
 				return fmt.Errorf("unable to migrate files with empty destination or empty file path")
 			}
-			transfer(2, context.String("destination"), context.String("image-path"))
+			transfer("cr", 2, context.String("destination"), context.String("image-path"))
 		}
 		return nil
 	},

@@ -1,14 +1,21 @@
 package main
 
 import (
-	"archive/tar"
-	"compress/gzip"
-	"encoding/binary"
-	"io"
+	// "archive/tar"
+	// "compress/gzip"
+	// "encoding/binary"
+	// "io"
 	"log"
 	"net"
-	"os"
+	// "os"
+	"encoding/json"
 )
+
+// type Message struct {
+// 	DumpType int	`json:"dumpType"`
+// 	ContainerID string 	`json:"containerID"`
+// }
+
 
 func receive() {
 	listener, err := net.Listen("tcp", ":8080")
