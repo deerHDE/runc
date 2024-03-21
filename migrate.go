@@ -94,12 +94,14 @@ checkpointed.`,
 			currentTime := time.Now()
 			fmt.Println("Dumping Start:", currentTime.Format("2006-01-02 15:04:05.000000"))
 			container.Checkpoint(options)
+			currentTime2 := time.Now()
+			fmt.Println("Dumping Finish:", currentTime2.Format("2006-01-02 15:04:05.000000"))
 		}
 
 		if context.Bool("local-test") || context.Bool("receiver") {
 			status, err := startContainer(context, CT_ACT_RESTORE, options)
-			currentTime := time.Now()
-			fmt.Println("Restore Finish:", currentTime.Format("2006-01-02 15:04:05.000000"))
+			// currentTime := time.Now()
+			// fmt.Println("Restore Finish:", currentTime.Format("2006-01-02 15:04:05.000000"))
 			if err != nil {
 				return err
 			}
