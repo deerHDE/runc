@@ -18,19 +18,19 @@ This is a CSE291 Virtualization course project about live migration of container
 To build a docker container from the `ExampleContainer` folder and use `runc` to execute it, we first need to setup the docker image from the Dockerfile.
 
 ```bash
-docker build -t ....
+docker build -t mnist-trainer .
 ```
 
 Based on the docker image, we can build the root file system for the container.
 
 ```bash
-docker export ... > rootfs.tar
+docker export $(docker create mnist-trainer) > rootfs.tar
 ```
 
 Unzip the rootfs.tar to directory rootfs
 
 ```bash
-tar -xvf ...
+tar -xf rootfs.tar -C rootfs
 ```
 
 Now you can run the container with
@@ -52,14 +52,40 @@ sudo make install
 
 On the source machine, set up the NFS server:
 
-Give permission to the client for accessing the shared directory
+```bash
+sudo apt install nfs-kernel-server
+```
+
+Give permission to the client for accessing the shared directory by adding this line to the `/etc/exports` file
+
+```bash
+/var/nfs/general <dest_ip>(rw,sync,no_subtree_check,no_root_squash)
+```
+
+Then, start NFS server
+
+```bash
+sudo systemctl restart nfs-kernel-server
+```
 
 On the destination, mount the NFS directory by the following command:
 
+```bash
+sudo mount <source_ip>:/var/nfs/general ~/containers
+```
+
 #### Testing
 
-On the destination host, run .... to prepare for receiving:
+On the destination host, run the following command to prepare for receiving:
 
-On the source machine, run:
+```bash
+sudo runc live-migrate <container_ID> --image-path=/var/nfs/general
+```
+
+On the source machine, after starting the container, run:
+
+```bash
+sudo runc live-migrate <container_ID> --image-path=/var/nfs/general --destination=<dest_ip>
+```
 
 You can see that the container starts off from the point it was stopped on the source host.
